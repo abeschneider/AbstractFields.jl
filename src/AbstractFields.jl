@@ -1,5 +1,30 @@
 module AbstractFields
 
-# package code goes here
+export @_abstract, @_type, @_immutable
 
-end # module
+# global registry of all abstract classes defined
+abstract_declarations = Dict{Symbol, Array}()
+
+macro _abstract(sym, block)
+  abstract_declarations[sym] = [Expr(:(::), var.args[1], var.args[2]) for var in block.args[2:2:end]]
+
+  Expr(:abstract, esc(sym), abstract_declarations)
+end
+
+macro _type(sym, parent, block)
+  parent_declarations = abstract_declarations[parent]
+  child_declarations = [Expr(:(::), var.args[1], var.args[2]) for var in block.args[2:2:end]]
+  declarations = vcat(parent_declarations, child_declarations)
+
+  Expr(:type, true, Expr(:<:, esc(sym), esc(parent)), Expr(:block, declarations...))
+end
+
+macro _immutable(sym, parent, block)
+  parent_declarations = abstract_declarations[parent]
+  child_declarations = [Expr(:(::), var.args[1], var.args[2]) for var in block.args[2:2:end]]
+  declarations = vcat(parent_declarations, child_declarations)
+
+  Expr(:immutable, true, Expr(:<:, esc(sym), esc(parent)), Expr(:block, declarations...))
+end
+
+end

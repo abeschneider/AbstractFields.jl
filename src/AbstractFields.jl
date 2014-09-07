@@ -19,12 +19,12 @@ macro _type(sym, parent, block)
   Expr(:type, true, Expr(:<:, esc(sym), esc(parent)), Expr(:block, declarations...))
 end
 
-macro _immutable(sym, parent, block)
-  parent_declarations = abstract_declarations[parent]
-  child_declarations = [Expr(:(::), var.args[1], var.args[2]) for var in block.args[2:2:end]]
-  declarations = vcat(parent_declarations, child_declarations)
+# macro _immutable(sym, parent, block)
+#   parent_declarations = abstract_declarations[parent]
+#   child_declarations = [Expr(:(::), var.args[1], var.args[2]) for var in block.args[2:2:end]]
+#   declarations = vcat(parent_declarations, child_declarations)
 
-  Expr(:immutable, true, Expr(:<:, esc(sym), esc(parent)), Expr(:block, declarations...))
-end
+#   Expr(:type, false, Expr(:<:, esc(sym), esc(parent)), Expr(:block, declarations...))
+# end
 
 end
